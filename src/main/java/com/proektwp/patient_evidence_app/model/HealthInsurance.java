@@ -19,16 +19,10 @@ public class HealthInsurance {
     @Column
     public String typeOfHealthProtection;
 
-    @OneToOne
+    @OneToOne(mappedBy = "healthInsurance")
     public Patient patient;
-
 
     public HealthInsurance(){}
 
-    public HealthInsurance(String healthLegitimationNumber, String registrationNumber, String activityID, String typeOfHealthProtection) {
-        this.healthLegitimationNumber = healthLegitimationNumber;
-        this.registrationNumber = registrationNumber;
-        this.activityID = activityID;
-        this.typeOfHealthProtection = typeOfHealthProtection;
-    }
+
 }
