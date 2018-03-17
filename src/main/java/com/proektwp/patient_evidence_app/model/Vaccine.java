@@ -1,5 +1,7 @@
 package com.proektwp.patient_evidence_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -7,25 +9,24 @@ import java.util.Date;
 @Table(name = "vaccine")
 public class Vaccine {
 
-    @Id
-    public String name;
+    @EmbeddedId
+    public VaccineID vaccineID;
 
-    @Column
     @Temporal(TemporalType.DATE)
     public Date dateOfReceipt;
 
-    @Column
-    public Boolean revaccination;
-
-    @Column
-    @Temporal(TemporalType.DATE)
-    public Date dateOfRevaccination;
 
 
+    @MapsId("userId")
     @ManyToOne
+    @JsonIgnore
     public Patient patient;
 
     public Vaccine(){};
 
-
+    public Vaccine(VaccineID vaccineID, Date dateOfReceipt, Patient patient) {
+        this.vaccineID = vaccineID;
+        this.dateOfReceipt = dateOfReceipt;
+        this.patient = patient;
+    }
 }

@@ -1,46 +1,51 @@
 package com.proektwp.patient_evidence_app.model;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "family_doctor")
-public class FamilyDoctor {
-    @Id
-    public String number_OfStamp;
+public class FamilyDoctor extends User{
 
-    @Column
-    public String firstName;
-
-    @Column
-    public String lastName;
-
-    @Column
     public Boolean agreement_with_FZO;
 
-    @Column
     public String speciality;
 
-    @Column
     public String address;
 
-    @Column
     public String phoneNumber;
 
-    @Column
     public String email;
 
-    @Column
     public String workTime;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
+    @OneToOne(cascade = CascadeType.ALL, fetch =  FetchType.LAZY)
+    @JsonIgnore
     public FamilyDoctor deputyFamilyDoctor;
 
-    @OneToMany(mappedBy = "familyDoctor")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "familyDoctor")
+    @JsonIgnore
     public List<Patient> patients;
     // so brishenje na doktorot da mu se naznaci drug doktor
 
     public FamilyDoctor(){}
 
+    public FamilyDoctor(String userId, String firstName, String lastName, String password) {
+        super(userId, firstName, lastName, "ROLE_ADMIN", password);
+    }
 
+    public FamilyDoctor(String userId, String firstName, String lastName, String password, Boolean agreement_with_FZO, String speciality, String address, String phoneNumber, String email, String workTime, FamilyDoctor deputyFamilyDoctor, List<Patient> patients) {
+        super(userId, firstName, lastName, "ROLE_ADMIN", password);
+        this.agreement_with_FZO = agreement_with_FZO;
+        this.speciality = speciality;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.workTime = workTime;
+        this.deputyFamilyDoctor = deputyFamilyDoctor;
+        this.patients = patients;
+    }
 }

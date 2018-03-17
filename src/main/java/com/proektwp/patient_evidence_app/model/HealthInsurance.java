@@ -1,5 +1,7 @@
 package com.proektwp.patient_evidence_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -7,22 +9,25 @@ import javax.persistence.*;
 public class HealthInsurance {
 
     @Id
-    @Column(name="insurance_id")
     public String healthLegitimationNumber;
 
-    @Column
     public String registrationNumber;
 
-    @Column
     public String activityID;
 
-    @Column
     public String typeOfHealthProtection;
 
-    @OneToOne(mappedBy = "healthInsurance")
+    @OneToOne
+    @JsonIgnore
     public Patient patient;
+    // nena
 
     public HealthInsurance(){}
 
-
+    public HealthInsurance(String healthLegitimationNumber, String registrationNumber, String activityID, String typeOfHealthProtection) {
+        this.healthLegitimationNumber = healthLegitimationNumber;
+        this.registrationNumber = registrationNumber;
+        this.activityID = activityID;
+        this.typeOfHealthProtection = typeOfHealthProtection;
+    }
 }
