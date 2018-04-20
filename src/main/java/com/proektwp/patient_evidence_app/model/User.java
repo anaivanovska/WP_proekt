@@ -1,6 +1,8 @@
 package com.proektwp.patient_evidence_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "user")
@@ -10,21 +12,42 @@ public class User {
     @Id
     public String userId;
 
+    @NotNull
     public String firstName;
+
+    @NotNull
     public String lastName;
-    public String role;
+
+    @NotNull
+    public Role role;
+
+    @JsonIgnore
+    @NotNull
     public String password;
 
+    @NotNull
+    public String email;
+
+    @NotNull
+    public String phoneNumber;
+
+
+    @NotNull
+    public String address;
 
     public User(){}
 
-    public User(String userId, String firstName, String lastName, String role, String password) {
+    public User(String userId, String firstName, String lastName, Role role, String password, String email, String phoneNumber, String address) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = role;
         this.password = password;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
     }
+
 
     public User(User user) {
         this.userId = user.userId;
@@ -32,5 +55,11 @@ public class User {
         this.lastName = user.lastName;
         this.role = user.role;
         this.password = user.password;
+        this.email = user.email;
+        this.phoneNumber = user.phoneNumber;
+        this.address = user.address;
     }
+
+
+
 }

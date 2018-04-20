@@ -6,14 +6,20 @@ import java.io.Serializable;
 @Embeddable
 public class VaccineID implements Serializable{
     String name;
+    String userId;
 
     public void setUserId(String userId) {
         this.userId = userId;
     }
-
-    String userId;
-
-    public void setName(String name) {
+     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUserId() {
+        return userId;
     }
 }

@@ -24,9 +24,12 @@ public class Vaccine {
 
     public Vaccine(){};
 
-    public Vaccine(VaccineID vaccineID, Date dateOfReceipt, Patient patient) {
-        this.vaccineID = vaccineID;
+    public Vaccine(String name, Date dateOfReceipt, Patient patient){
+        vaccineID = new VaccineID();
+        vaccineID.setName(name);
         this.dateOfReceipt = dateOfReceipt;
         this.patient = patient;
     }
+
+
 }

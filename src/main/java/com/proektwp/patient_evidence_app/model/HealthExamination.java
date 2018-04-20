@@ -1,8 +1,10 @@
 package com.proektwp.patient_evidence_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -13,25 +15,45 @@ public class HealthExamination {
     @EmbeddedId
     public HealthExaminationID examinationID;
 
+    @NotNull
     public String diagnosisAtMKB;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean laboratory_Finding;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean RTC_Finding;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean EHO_Finding;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean computed_Tomography;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean magnetic_Resonance;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean sent_To_A_specialist;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean illness;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean bandage;
 
+    @Column(columnDefinition = "TINYINT")
+    @Type(type = "org.hibernate.type.NumericBooleanType")
     public Boolean antibody_Prophylaxis;
+
 
     public String typeOfTherapy;
 
@@ -45,8 +67,9 @@ public class HealthExamination {
 
     public HealthExamination(){}
 
-    public HealthExamination(HealthExaminationID healthExaminationID, String diagnosisAtMKB, Boolean laboratory_Finding, Boolean RTC_Finding, Boolean EHO_Finding, Boolean computed_Tomography, Boolean magnetic_Resonance, Boolean sent_To_A_specialist, Boolean illness, Boolean bandage, Boolean antibody_Prophylaxis, String  typeOfTherapy, Patient patient) {
-        this.examinationID = healthExaminationID;
+    public HealthExamination(Date dateOfExamination, String diagnosisAtMKB, Boolean laboratory_Finding, Boolean RTC_Finding, Boolean EHO_Finding, Boolean computed_Tomography, Boolean magnetic_Resonance, Boolean sent_To_A_specialist, Boolean illness, Boolean bandage, Boolean antibody_Prophylaxis, String  typeOfTherapy, Patient patient) {
+        this.examinationID = new HealthExaminationID();
+        this.examinationID.setDateOfExamination(dateOfExamination);
         this.diagnosisAtMKB = diagnosisAtMKB;
         this.laboratory_Finding = laboratory_Finding;
         this.RTC_Finding = RTC_Finding;

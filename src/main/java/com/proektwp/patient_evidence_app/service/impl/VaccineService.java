@@ -3,6 +3,7 @@ package com.proektwp.patient_evidence_app.service.impl;
 import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.model.Vaccine;
 import com.proektwp.patient_evidence_app.model.VaccineID;
+import com.proektwp.patient_evidence_app.model.exceptions.VaccineNotFoundException;
 import com.proektwp.patient_evidence_app.persistence.PatientRepository;
 import com.proektwp.patient_evidence_app.persistence.VaccineRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,43 +17,47 @@ import java.util.List;
 public class VaccineService implements com.proektwp.patient_evidence_app.service.VaccineService {
 
     private VaccineRepository vaccineRepository;
-    private PatientRepository patientRepository;
 
     @Autowired
-    public VaccineService(VaccineRepository vaccineRepository, PatientRepository patientRepository) {
+    public VaccineService(VaccineRepository vaccineRepository) {
         this.vaccineRepository = vaccineRepository;
-        this.patientRepository = patientRepository;
     }
 
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Vaccine> findAllVaccinesForPatient(String patientID) {
-        Patient patient = this.patientRepository.findOne(patientID);
-
-        return this.vaccineRepository.findByPatient(patient);
-    }
-
-    @Override
-    @Transactional
-    public Vaccine addNewVaccine(String name, Date date, String patientID) {
-        VaccineID vaccineID = new VaccineID();
-        vaccineID.setName(name);
-        Patient patient= this.patientRepository.findOne(patientID);
-        Vaccine vaccine = new Vaccine(vaccineID, date, patient);
-
-        return this.vaccineRepository.save(vaccine);
-    }
-
-    @Override
-    @Transactional
-    public Vaccine updateVaccine(String name, Date dateOfReceipt, String patientID) {
-        VaccineID vaccineID = new VaccineID();
-        vaccineID.setName(name);
-        vaccineID.setUserId(patientID);
+    public Vaccine findVaccineByID(VaccineID vaccineID) {
         Vaccine vaccine = this.vaccineRepository.findOne(vaccineID);
-        vaccine.dateOfReceipt = dateOfReceipt;
-        //uedjh
-        return this.vaccineRepository.save(vaccine);
+        if(vaccine == null){
+            throw new VaccineNotFoundException(vaccineID.getName(), vaccineID.getUserId());
+        }
+        return vaccine;
     }
+
+    @Override
+    @Transactional
+    public Vaccine addNewVaccine(Vaccine newVaccine) {
+
+        Vaccine vaccine = this.vaccineRepository.findOne(newVaccine.vaccineID);
+        if(vaccine != null){
+
+        }
+        return this.vaccineRepository.save(newVaccine);
+    }
+
+    @Override
+    @Transactional
+    public Vaccine updateVaccine(Vaccine vaccine){
+        Vaccine updatedVaccine = this.findVaccineByID(vaccine.vaccineID);
+        updatedVaccine.dateOfReceipt = vaccine.dateOfReceipt;
+        return this.vaccineRepository.save(updatedVaccine);
+    }
+
+    @Override
+    public Vaccine deleteVaccine(VaccineID vaccineID) {
+        Vaccine vaccine = this.findVaccineByID(vaccineID);
+        this.vaccineRepository.delete(vaccineID);
+        return vaccine;
+    }
+
+
 }

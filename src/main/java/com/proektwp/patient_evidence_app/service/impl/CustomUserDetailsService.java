@@ -22,13 +22,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         this.userRepository = userRepository;
     }
 
-
     @Override
     public UserDetails loadUserByUsername(String userId) throws UsernameNotFoundException {
+        System.out.println("vo load USER");
         Optional<User> optionalUser = userRepository.findUserByUserId(userId);
-
         optionalUser.orElseThrow(() -> new UsernameNotFoundException(userId));
-
+        System.out.println(optionalUser.get().userId);
         return optionalUser.map(CustomUserDetails::new).get();
     }
 }

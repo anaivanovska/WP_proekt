@@ -1,15 +1,12 @@
 package com.proektwp.patient_evidence_app.service;
-
-import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.model.Vaccine;
-
-import java.util.Date;
-import java.util.List;
+import com.proektwp.patient_evidence_app.model.VaccineID;
 
 public interface VaccineService {
-    public List<Vaccine> findAllVaccinesForPatient(String patientID);
-    public Vaccine addNewVaccine(String name, Date date, String patientID );
-    public Vaccine updateVaccine(String name, Date dateOfReceipt, String patientID);
+    public Vaccine findVaccineByID(VaccineID vaccineID);
+    public Vaccine addNewVaccine(Vaccine vaccine);
+    public Vaccine updateVaccine(Vaccine vaccine);
+    public Vaccine deleteVaccine(VaccineID vaccineID);
 
 
 }

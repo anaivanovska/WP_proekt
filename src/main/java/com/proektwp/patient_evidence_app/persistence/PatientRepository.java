@@ -12,4 +12,6 @@ import java.util.List;
 public interface PatientRepository extends JpaRepository<Patient, String> {
 
     public Page<Patient> findAllByFamilyDoctor(FamilyDoctor familyDoctor, Pageable pageable);
+    public List<Patient> findAllByFamilyDoctor(FamilyDoctor familyDoctor);
+
 }
