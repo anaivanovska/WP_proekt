@@ -3,6 +3,7 @@ package com.proektwp.patient_evidence_app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.hibernate.search.annotations.Indexed;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+
+@Indexed
 @Entity
 @Table(name="patient")
 public class Patient extends User{
@@ -24,10 +27,10 @@ public class Patient extends User{
     public String embg;
 
     @NotNull
-    public String proffesion;
+    public String profession;
 
     @NotNull
-    public String marrigeState;
+    public String marriageState;
 
     @ManyToOne
     @JsonIgnoreProperties("deputyFamilyDoctor")
@@ -49,13 +52,13 @@ public class Patient extends User{
     };
 
 
-    public Patient(String userId, String firstName, String lastName, String password, String email, String phoneNumber, String address, Date dateOfBirth, String gender, String embg, String proffesion, String marrigeState, FamilyDoctor familyDoctor) {
+    public Patient(String userId, String firstName, String lastName, String password, String email, String phoneNumber, String address, Date dateOfBirth, String gender, String embg, String profession, String marriageState, FamilyDoctor familyDoctor) {
         super(userId, firstName, lastName, Role.ROLE_PATIENT, password, email, phoneNumber, address);
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
         this.embg = embg;
-        this.proffesion = proffesion;
-        this.marrigeState = marrigeState;
+        this.profession = profession;
+        this.marriageState = marriageState;
         this.familyDoctor = familyDoctor;
         this.healthInsurance = null;
         this.healthExaminations = null;

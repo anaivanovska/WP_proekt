@@ -12,6 +12,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -59,21 +62,22 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
 
     @Override
     @Transactional
-    public Patient addNewPatient(String patientID, String firstName, String lastName, String password,String email , String phoneNumber, String address, Date dateOfBirth, String embg, String gender, String proffesion, String marrigeState, String doctorID) throws PatientExistsException {
-        Patient patient = this.patientRepository.findOne(patientID);
+    public Patient addNewPatient(PatientDTO patientDTO) throws PatientExistsException, ParseException {
+        Patient patient = this.patientRepository.findOne(patientDTO.getUserId());
 
         if(patient  != null){
             throw new PatientExistsException(patient.userId);
         }
 
-        FamilyDoctor familyDoctor = this.familyDoctorRepository.findOne(doctorID);
+        FamilyDoctor familyDoctor = this.familyDoctorRepository.findOne(patientDTO.getFamilyDoctorID());
 
         if(familyDoctor == null){
-            throw new DoctorNotFoundException(doctorID);
+            throw new DoctorNotFoundException(patientDTO.getFamilyDoctorID());
         }
 
-        String encryptedPassword = this.bCryptPasswordEncoder.encode(password);
-        patient = new Patient(patientID, firstName, lastName, encryptedPassword, email, phoneNumber, address, dateOfBirth, embg, gender, proffesion, marrigeState, familyDoctor );
+        String encryptedPassword = this.bCryptPasswordEncoder.encode(patientDTO.getPassword());
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        patient = new Patient(patientDTO.getUserId(), patientDTO.getFirstName(), patientDTO.getLastName(), encryptedPassword, patientDTO.getEmail(), patientDTO.getPhoneNumber(), patientDTO.getAddress(), sdf.parse(patientDTO.getDateOfBirth()), patientDTO.getEmbg(), patientDTO.getGender(), patientDTO.getProfession(), patientDTO.getMarriageState(), familyDoctor );
         return this.patientRepository.save(patient);
     }
 
@@ -85,23 +89,20 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
         return patient;
     }
 
+
     @Override
     @Transactional
-    public Patient updatePatient(String patientID, String firstName, String lastName, String password,String email , String phoneNumber, String address, Date dateOfBirth, String embg, String gender, String proffesion, String marrigeState, String doctorID){
-        Patient updatedPatient = this.findPatientByID(patientID);
+    public Patient updatePatient(PatientDTO patientDTO) throws ParseException {
+        Patient updatedPatient = this.findPatientByID(patientDTO.getUserId());
 
-            updatedPatient.firstName=firstName;
-            updatedPatient.lastName=lastName;
-            updatedPatient.password = this.bCryptPasswordEncoder.encode(password);
-            updatedPatient.email=email;
-            updatedPatient.phoneNumber = phoneNumber;
-            updatedPatient.address=address;
-            updatedPatient.dateOfBirth = dateOfBirth;
-            updatedPatient.gender = gender;
-            updatedPatient.embg=embg;
-            updatedPatient.proffesion = proffesion;
-            updatedPatient.marrigeState = marrigeState;
-            updatedPatient.familyDoctor = this.familyDoctorRepository.findOne(doctorID);
+            updatedPatient.firstName=patientDTO.getFirstName();
+            updatedPatient.lastName=patientDTO.getLastName();
+            updatedPatient.email=patientDTO.getEmail();
+            updatedPatient.phoneNumber = patientDTO.getPhoneNumber();
+            updatedPatient.address=patientDTO.getAddress();
+            updatedPatient.dateOfBirth = new SimpleDateFormat("yyyy-MM-dd").parse(patientDTO.getDateOfBirth());
+            updatedPatient.profession = patientDTO.getProfession();
+            updatedPatient.marriageState = patientDTO.getMarriageState();
         return this.patientRepository.save(updatedPatient);
     }
 

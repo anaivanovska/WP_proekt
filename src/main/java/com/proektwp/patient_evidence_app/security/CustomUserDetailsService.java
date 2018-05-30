@@ -1,8 +1,8 @@
-package com.proektwp.patient_evidence_app.service.impl;
+package com.proektwp.patient_evidence_app.security;
 
-import com.proektwp.patient_evidence_app.model.CustomUserDetails;
+import com.proektwp.patient_evidence_app.security.CustomUserDetails;
 import com.proektwp.patient_evidence_app.model.User;
-import com.proektwp.patient_evidence_app.persistence.UserRepository;
+import com.proektwp.patient_evidence_app.security.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

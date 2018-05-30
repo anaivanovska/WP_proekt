@@ -1,73 +1,84 @@
 package com.proektwp.patient_evidence_app.web;
 
 import com.proektwp.patient_evidence_app.model.FamilyDoctor;
+import com.proektwp.patient_evidence_app.model.FamilyDoctorDTO;
 import com.proektwp.patient_evidence_app.model.Patient;
+import com.proektwp.patient_evidence_app.security.CustomUserDetails;
+import com.proektwp.patient_evidence_app.security.JwtTokenUtil;
 import com.proektwp.patient_evidence_app.service.impl.FamilyDoctorService;
+import com.proektwp.patient_evidence_app.service.impl.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.awt.print.Pageable;
 import java.util.List;
 
 @RestController
-//@Secured("ROLE_DOCTOR")
-@RequestMapping(value="familyDoctor", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value="/api/doctor", produces = MediaType.APPLICATION_JSON_VALUE)
 public class FamilyDoctorController {
+
+    @Value("${jwt.header}")
+    private String tokenHeader;
+    private JwtTokenUtil jwtTokenUtil;
     private FamilyDoctorService familyDoctorService;
+    private PatientService patientService;
 
     @Autowired
-    public FamilyDoctorController(FamilyDoctorService familyDoctorService) {
+    public FamilyDoctorController(JwtTokenUtil jwtTokenUtil, FamilyDoctorService familyDoctorService, PatientService patientService) {
+        this.jwtTokenUtil = jwtTokenUtil;
         this.familyDoctorService = familyDoctorService;
+        this.patientService = patientService;
     }
 
-    @CrossOrigin
-    @GetMapping(value = "/{doctorID}")
-    public FamilyDoctor findFamilyDoctor(@PathVariable(value = "doctorID") String doctorID) {
-        return this.familyDoctorService.findFamilyDoctorById(doctorID);
-    }
+
 
     @CrossOrigin
-    @GetMapping(value = "/{doctorID}/patients")
-    public  Page<Patient> findPatientsForFamilyDoctor(@PathVariable String doctorID){
-        return this.familyDoctorService.findAllPatients(doctorID);
+    @GetMapping(value = "/get")
+    public FamilyDoctor findFamilyDoctor(HttpServletRequest request) {
+        String authToken = request.getHeader(tokenHeader).substring(7);
+        String username = this.jwtTokenUtil.getUsernameFromToken(authToken);
+        return this.familyDoctorService.findFamilyDoctorById(username);
+    }
+
+
+    @CrossOrigin
+    @GetMapping(value = "/patients")
+    public  Page<Patient> findPatientsForFamilyDoctor(){
+        CustomUserDetails authenticatedUserDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.familyDoctorService.findAllPatients(authenticatedUserDetails.userId);
     }
 
     @CrossOrigin
     @PostMapping(value = "/addNewFamilyDoctor")
-    public FamilyDoctor addNewFamilyDoctor(@RequestParam(required = true) String doctorID,@RequestParam(required = true) String firstName,
-                                                 @RequestParam(required = true) String lastName,@RequestParam(required = true)  String password,
-                                                 @RequestParam(required = true) String email,@RequestParam(required = true) String phoneNumber,
-                                                 @RequestParam(required = true) String address,@RequestParam(required = true) Boolean agreement_with_FZO,
-                                                 @RequestParam(required = true) String speciality,@RequestParam(required = true) String workTime,
-                                                 @RequestParam(required = true) String deputyDoctorID, HttpServletResponse response){
-        return this.familyDoctorService.addNewFamilyDoctor(doctorID, firstName,
-                                                            lastName, password,
-                                                            email, phoneNumber,
-                                                            address,agreement_with_FZO, speciality,
-                                                            workTime, deputyDoctorID);
+    public FamilyDoctor addNewFamilyDoctor(@ModelAttribute FamilyDoctorDTO familyDoctorDTO, HttpServletResponse response){
+        return this.familyDoctorService.addNewFamilyDoctor(familyDoctorDTO);
     }
 
     @CrossOrigin
-    @PostMapping(value = "/{doctorID}/update")
-    public FamilyDoctor updateFamilyDoctor(@PathVariable(required = true) String doctorID,@RequestParam String firstName,
-                                           @RequestParam String lastName,@RequestParam  String password,
-                                           @RequestParam String email,@RequestParam String phoneNumber,
-                                           @RequestParam String address,@RequestParam Boolean agreement_with_FZO,
-                                           @RequestParam String speciality,@RequestParam String workTime,
-                                           @RequestParam String deputyDoctorID, HttpServletResponse response){
-        return this.familyDoctorService.updateFamilyDoctor(doctorID, firstName, lastName, password, email, phoneNumber, address, agreement_with_FZO, speciality, workTime, deputyDoctorID);
+    @PostMapping(value = "/update")
+    public FamilyDoctor updateFamilyDoctor(@ModelAttribute FamilyDoctorDTO familyDoctorDTO){
+        System.out.println(familyDoctorDTO.getUserId() + " FirstName: " + familyDoctorDTO.getFirstName());
+        return this.familyDoctorService.updateFamilyDoctor(familyDoctorDTO);
 
     }
 
     @CrossOrigin
-    @DeleteMapping(value = "/{doctorID}/delete")
+    @DeleteMapping(value = "/delete")
     public FamilyDoctor deleteFamilyDoctor(@PathVariable String doctorID){
         return this.familyDoctorService.deleteFamilyDoctor(doctorID);
     }
 
 
+    @CrossOrigin
+    @GetMapping(value = "/patient/{patientId}")
+    public Patient getPatient(@PathVariable String patientId){
+        return this.patientService.findPatientByID(patientId);
+    }
 }

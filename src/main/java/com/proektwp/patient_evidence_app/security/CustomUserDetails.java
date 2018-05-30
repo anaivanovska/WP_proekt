@@ -1,12 +1,10 @@
-package com.proektwp.patient_evidence_app.model;
+package com.proektwp.patient_evidence_app.security;
 
+import com.proektwp.patient_evidence_app.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class CustomUserDetails extends User implements org.springframework.security.core.userdetails.UserDetails {
     
@@ -20,6 +18,7 @@ public class CustomUserDetails extends User implements org.springframework.secur
       return  AuthorityUtils.createAuthorityList(String.valueOf(this.role));
 
     }
+
 
     @Override
     public String getPassword() {

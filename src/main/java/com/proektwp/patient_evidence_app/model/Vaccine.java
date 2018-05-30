@@ -18,18 +18,13 @@ public class Vaccine {
 
 
     @MapsId("userId")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     public Patient patient;
 
     public Vaccine(){};
 
-    public Vaccine(String name, Date dateOfReceipt, Patient patient){
-        vaccineID = new VaccineID();
-        vaccineID.setName(name);
-        this.dateOfReceipt = dateOfReceipt;
-        this.patient = patient;
-    }
+
 
 
 }

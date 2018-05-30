@@ -1,15 +1,20 @@
 package com.proektwp.patient_evidence_app.web;
 
 import com.proektwp.patient_evidence_app.model.*;
+import com.proektwp.patient_evidence_app.security.CustomUserDetails;
+import com.proektwp.patient_evidence_app.security.JwtTokenUtil;
 import com.proektwp.patient_evidence_app.service.impl.FamilyDoctorService;
 import com.proektwp.patient_evidence_app.service.impl.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sun.java2d.pipe.SpanShapeRenderer;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
@@ -19,55 +24,54 @@ import java.util.List;
 
 @RestController
 //@Secured({"ROLE_PATIENT", "ROLE_DOCTOR"})
-@RequestMapping(value = "patient",produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/patient",produces = MediaType.APPLICATION_JSON_VALUE)
 public class PatientController {
 
+    @Value("${jwt.header}")
+    private String tokenHeader;
     private PatientService patientService;
-    private FamilyDoctorService familyDoctorService;
+    private JwtTokenUtil jwtTokenUtil;
+
 
     @Autowired
-    public PatientController(PatientService patientService, FamilyDoctorService familyDoctorService){
+    public PatientController(PatientService patientService, JwtTokenUtil jwtTokenUtil) {
         this.patientService = patientService;
-        this.familyDoctorService = familyDoctorService;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
+
+
 
 
     @CrossOrigin
     @PostMapping(value="/addNewPatient")
-    public Patient addNewPatient(@RequestParam(required = true) String patientID, @RequestParam(required = true) String firstName,
-                                 @RequestParam(required = true) String lastName, @RequestParam(required = true) String password,
-                                 @RequestParam String email, @RequestParam String phoneNumber,
-                                 @RequestParam String address, @RequestParam String dateOfBirth,
-                                 @RequestParam String gender,@RequestParam String embg,
-                                 @RequestParam String proffesion, @RequestParam String marrigeState,
-                                 @RequestParam String doctorID, HttpServletResponse response
+    public Patient addNewPatient(@ModelAttribute PatientDTO patientDTO, HttpServletResponse response
     ) throws ParseException, IOException {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        return this.patientService.addNewPatient(patientID, firstName,
-                                                 lastName, password,
-                                                 email, phoneNumber,
-                                                 address, sdf.parse(dateOfBirth),
-                                                 gender, embg,
-                                                 proffesion, marrigeState, doctorID);
+        return this.patientService.addNewPatient(patientDTO);
     }
 
     @CrossOrigin
-    @GetMapping(value="/{patientID}")
-    public Patient findPatientWithID(@PathVariable String patientID){
-        return this.patientService.findPatientByID(patientID);
-    }
+    @GetMapping(value="/getPatient")
+    public Patient getPatient(HttpServletRequest request){
+        String authToken = request.getHeader(tokenHeader).substring(7);
+        String username = this.jwtTokenUtil.getUsernameFromToken(authToken);
+        return this.patientService.findPatientByID(username);
 
-    @CrossOrigin
-    @GetMapping(value = "/{patientID}/examinationList")
-    public Page<HealthExamination> findHealthExaminationsForPatient(@PathVariable String patientID){
-        return this.patientService.findHealthExaminationsForPatient(patientID);
     }
 
 
     @CrossOrigin
-    @GetMapping(value = "/{patientID}/vaccines")
-    public List<Vaccine> findVaccinesForPatient(@PathVariable String patientID){
-        return this.patientService.findVaccinesForPatient(patientID);
+    @GetMapping(value = "/examinations")
+    public Page<HealthExamination> findHealthExaminationsForPatient(HttpServletRequest request){
+       CustomUserDetails userDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.patientService.findHealthExaminationsForPatient(userDetails.userId);
+    }
+
+
+    @CrossOrigin
+    @GetMapping(value = "/vaccines")
+    public List<Vaccine> findVaccinesForPatient(HttpServletRequest request){
+        CustomUserDetails userDetails = (CustomUserDetails)SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return this.patientService.findVaccinesForPatient(userDetails.userId);
     }
 
 
@@ -75,21 +79,14 @@ public class PatientController {
 
 
     @CrossOrigin
-    @PostMapping(value = "/{patientID}/update")
-    public Patient updatePatient(@PathVariable String patientID, @RequestParam(required = true) String firstName,
-                                 @RequestParam(required = true) String lastName, @RequestParam(required = true) String password,
-                                 @RequestParam String email, @RequestParam String phoneNumber,
-                                 @RequestParam String address, @RequestParam Date dateOfBirth,
-                                 @RequestParam String gender, @RequestParam String embg,
-                                 @RequestParam String proffesion, @RequestParam String marrigeState,
-                                 @RequestParam String doctorID, HttpServletResponse response
-    ) {
-        return this.patientService.updatePatient(patientID, firstName, lastName, password, email, phoneNumber, address, dateOfBirth, embg, gender,proffesion, marrigeState,doctorID);
+    @PostMapping(value = "/update")
+    public Patient updatePatient(@ModelAttribute PatientDTO patientDTO) throws ParseException {
+        return this.patientService.updatePatient(patientDTO);
     }
 
     @CrossOrigin
-    @DeleteMapping(value="/{patientID}/delete")
-    public Patient deletePatient(@PathVariable String patientID){
+    @DeleteMapping(value="/delete")
+    public Patient deletePatient(@RequestParam String patientID){
         return this.patientService.deletePatient(patientID);
     }
 

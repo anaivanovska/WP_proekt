@@ -1,9 +1,14 @@
 package com.proektwp.patient_evidence_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.Store;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+@Indexed
 @Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -13,9 +18,11 @@ public class User {
     public String userId;
 
     @NotNull
+    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO)
     public String firstName;
 
     @NotNull
+    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO)
     public String lastName;
 
     @NotNull
@@ -59,7 +66,6 @@ public class User {
         this.phoneNumber = user.phoneNumber;
         this.address = user.address;
     }
-
 
 
 }

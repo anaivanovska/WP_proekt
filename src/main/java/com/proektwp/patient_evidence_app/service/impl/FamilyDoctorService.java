@@ -2,6 +2,7 @@ package com.proektwp.patient_evidence_app.service.impl;
 
 
 import com.proektwp.patient_evidence_app.model.FamilyDoctor;
+import com.proektwp.patient_evidence_app.model.FamilyDoctorDTO;
 import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.model.exceptions.DoctorExsistsException;
 import com.proektwp.patient_evidence_app.model.exceptions.DoctorNotFoundException;
@@ -41,6 +42,7 @@ public class FamilyDoctorService implements com.proektwp.patient_evidence_app.se
         if(familyDoctor== null){
             throw new PatientNotFoundException(doctorID);
         }
+        System.out.println(familyDoctor.firstName);
         return familyDoctor;
     }
 
@@ -48,21 +50,20 @@ public class FamilyDoctorService implements com.proektwp.patient_evidence_app.se
     @Transactional(readOnly = true)
     public Page<Patient> findAllPatients(String doctorID) {
         FamilyDoctor familyDoctor = this.findFamilyDoctorById(doctorID);
-        Pageable pageable= new PageRequest(0,10, Sort.Direction.ASC, "lastName");
+        Pageable pageable= new PageRequest(0,5, Sort.Direction.ASC, "lastName");
         return this.patientRepository.findAllByFamilyDoctor(familyDoctor, pageable);
     }
 
     @Override
     @Transactional
-    public FamilyDoctor addNewFamilyDoctor(String doctorID, String firstName, String lastName, String password, String email, String phoneNumber, String address, Boolean agreement_with_FZO, String speciality, String workTime, String deputyFamilyDoctorID){
-        FamilyDoctor familyDoctor = this.familyDoctorRepository.findOne(doctorID);
+    public FamilyDoctor addNewFamilyDoctor(FamilyDoctorDTO familyDoctorDTO){
+        FamilyDoctor familyDoctor = this.familyDoctorRepository.findOne(familyDoctorDTO.getUserId());
         if(familyDoctor != null){
-            throw new DoctorExsistsException(doctorID);
+            throw new DoctorExsistsException(familyDoctorDTO.getUserId());
         }
-        FamilyDoctor deputyFamilyDoctor = this.findFamilyDoctorById(deputyFamilyDoctorID);
-        System.out.println("deputy ID: "+ deputyFamilyDoctor.userId);
-        String encryptedPassword = this.bCryptPasswordEncoder.encode(password);
-        familyDoctor = new FamilyDoctor(doctorID, firstName, lastName, encryptedPassword, email, phoneNumber, address,agreement_with_FZO, speciality, workTime, deputyFamilyDoctor);
+        FamilyDoctor deputyFamilyDoctor = this.findFamilyDoctorById(familyDoctorDTO.getDeputyFamilyDoctorID());
+        String encryptedPassword = this.bCryptPasswordEncoder.encode(familyDoctorDTO.getPassword());
+        familyDoctor = new FamilyDoctor(familyDoctorDTO.getUserId(), familyDoctorDTO.getFirstName(), familyDoctorDTO.getLastName(), encryptedPassword, familyDoctorDTO.getEmail(), familyDoctorDTO.getPhoneNumber(), familyDoctorDTO.getAddress(),familyDoctorDTO.getAgreement_with_FZO(), familyDoctorDTO.getSpeciality(), familyDoctorDTO.getWorkTime(), deputyFamilyDoctor);
         return familyDoctorRepository.save(familyDoctor);
     }
 
@@ -71,29 +72,53 @@ public class FamilyDoctorService implements com.proektwp.patient_evidence_app.se
     public FamilyDoctor deleteFamilyDoctor(String doctorID) {
         FamilyDoctor familyDoctor = this.findFamilyDoctorById(doctorID);
         FamilyDoctor deputyFamilyDoctor = familyDoctor.deputyFamilyDoctor;
-        //updatePatients(familyDoctor, deputyFamilyDoctor);
-        System.out.println("before delete");
         this.familyDoctorRepository.delete(familyDoctor);
-        System.out.println("after delete");
         //updateWhereDoctorISDeputy(familyDoctor, deputyFamilyDoctor);
         return familyDoctor;
      }
 
     @Override
     @Transactional
-    public FamilyDoctor updateFamilyDoctor(String doctorID, String firstName, String lastName, String password, String email, String phoneNumber, String address, Boolean agreement_with_FZO, String speciality, String workTime, String deputyFamilyDoctorID) {
-        FamilyDoctor deputyFamilyDoctor = this.findFamilyDoctorById(deputyFamilyDoctorID);
-        FamilyDoctor updatedFamilyDoctor = this.findFamilyDoctorById(doctorID);
-            updatedFamilyDoctor.firstName = firstName;
-            updatedFamilyDoctor.lastName = lastName;
-            updatedFamilyDoctor.password = this.bCryptPasswordEncoder.encode(password);
-            updatedFamilyDoctor.email = email;
-            updatedFamilyDoctor.phoneNumber = phoneNumber;
-            updatedFamilyDoctor.address=address;
-            updatedFamilyDoctor.agreement_with_FZO=agreement_with_FZO;
-            updatedFamilyDoctor.speciality=speciality;
-            updatedFamilyDoctor.workTime = workTime;
-            updatedFamilyDoctor.deputyFamilyDoctor = deputyFamilyDoctor;
+    public FamilyDoctor updateFamilyDoctor(FamilyDoctorDTO familyDoctorDTO) {
+        FamilyDoctor updatedFamilyDoctor = this.findFamilyDoctorById(familyDoctorDTO.getUserId());
+         //FirstName
+        if(!updatedFamilyDoctor.firstName.equals(familyDoctorDTO.getFirstName()) && familyDoctorDTO.getFirstName().trim().length() != 0){
+            updatedFamilyDoctor.firstName = familyDoctorDTO.getFirstName();
+        }
+        //Lastname
+        if(!updatedFamilyDoctor.lastName.equals(familyDoctorDTO.getLastName()) && familyDoctorDTO.getLastName().trim().length() != 0){
+            updatedFamilyDoctor.lastName = familyDoctorDTO.getLastName();
+        }
+        //Email
+        if(!updatedFamilyDoctor.email.equals(familyDoctorDTO.getEmail()) && familyDoctorDTO.getEmail().trim().length() != 0){
+            updatedFamilyDoctor.email = familyDoctorDTO.getEmail();
+        }
+        //PhoneNumber
+        if(!updatedFamilyDoctor.phoneNumber.equals(familyDoctorDTO.getPhoneNumber()) && familyDoctorDTO.getPhoneNumber().trim().length() != 0){
+            updatedFamilyDoctor.phoneNumber = familyDoctorDTO.getPhoneNumber();
+        }
+        //Address
+        if(!updatedFamilyDoctor.address.equals(familyDoctorDTO.getAddress()) && familyDoctorDTO.getAddress().trim().length() != 0){
+            updatedFamilyDoctor.address = familyDoctorDTO.getAddress();
+        }
+       //Agreement with FZO
+        if(!updatedFamilyDoctor.agreement_with_FZO.equals(familyDoctorDTO.getAgreement_with_FZO())){
+            updatedFamilyDoctor.agreement_with_FZO = familyDoctorDTO.getAgreement_with_FZO();
+        }
+        //Specialty
+        if(!updatedFamilyDoctor.speciality.equals(familyDoctorDTO.getSpeciality()) && familyDoctorDTO.getSpeciality().trim().length() != 0){
+            updatedFamilyDoctor.speciality = familyDoctorDTO.getSpeciality();
+        }
+        //Work time
+        if(!updatedFamilyDoctor.workTime.equals(familyDoctorDTO.getWorkTime()) && familyDoctorDTO.getWorkTime().trim().length() != 0){
+            updatedFamilyDoctor.workTime = familyDoctorDTO.getWorkTime();
+        }
+        //Deputy
+        if(!updatedFamilyDoctor.deputyFamilyDoctor.userId.equals(familyDoctorDTO.getDeputyFamilyDoctorID()) && familyDoctorDTO.getDeputyFamilyDoctorID().trim().length() != 0){
+            FamilyDoctor newDeputyFamilyDoctor = this.findFamilyDoctorById(familyDoctorDTO.getDeputyFamilyDoctorID());
+            updatedFamilyDoctor.deputyFamilyDoctor = newDeputyFamilyDoctor;
+        }
+
         return this.familyDoctorRepository.save(updatedFamilyDoctor);
 
     }
