@@ -1,10 +1,12 @@
 package com.proektwp.patient_evidence_app.service.impl;
 
 import com.proektwp.patient_evidence_app.model.*;
+import com.proektwp.patient_evidence_app.model.DTO.PatientDTO;
 import com.proektwp.patient_evidence_app.model.exceptions.DoctorNotFoundException;
 import com.proektwp.patient_evidence_app.model.exceptions.PatientExistsException;
 import com.proektwp.patient_evidence_app.model.exceptions.PatientNotFoundException;
 import com.proektwp.patient_evidence_app.persistence.*;
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,15 +26,17 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
     private PatientRepository patientRepository;
     private HealthExaminationRepository healthExaminationRepository;
     private VaccineRepository vaccineRepository;
+    private HealthInsuranceRepository healthInsuranceRepository;
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public PatientService(PatientRepository patientRepository,FamilyDoctorRepository familyDoctorRepository, HealthExaminationRepository healthExaminationRepository, VaccineRepository vaccineRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public PatientService(PatientRepository patientRepository,FamilyDoctorRepository familyDoctorRepository, HealthExaminationRepository healthExaminationRepository, VaccineRepository vaccineRepository, HealthInsuranceRepository healthInsuranceRepository,BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.patientRepository = patientRepository;
         this.familyDoctorRepository = familyDoctorRepository;
         this.healthExaminationRepository = healthExaminationRepository;
         this.vaccineRepository = vaccineRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.healthInsuranceRepository = healthInsuranceRepository;
     }
 
     @Override
@@ -75,10 +79,13 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
             throw new DoctorNotFoundException(patientDTO.getFamilyDoctorID());
         }
 
+        HealthInsurance patientInsurance = new HealthInsurance(patientDTO.getHealthLegitimationNumber(), patientDTO.getRegistrationNumber(), patientDTO.getActivityID(), patientDTO.getTypeOfHealthProtection());
+        this.healthInsuranceRepository.save(patientInsurance);
         String encryptedPassword = this.bCryptPasswordEncoder.encode(patientDTO.getPassword());
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        patient = new Patient(patientDTO.getUserId(), patientDTO.getFirstName(), patientDTO.getLastName(), encryptedPassword, patientDTO.getEmail(), patientDTO.getPhoneNumber(), patientDTO.getAddress(), sdf.parse(patientDTO.getDateOfBirth()), patientDTO.getEmbg(), patientDTO.getGender(), patientDTO.getProfession(), patientDTO.getMarriageState(), familyDoctor );
-        return this.patientRepository.save(patient);
+        System.out.println("GENDER: " + patientDTO.getGender());
+        patient = new Patient(patientDTO.getUserId(), patientDTO.getFirstName(), patientDTO.getLastName(), encryptedPassword, patientDTO.getEmail(), patientDTO.getPhoneNumber(), patientDTO.getAddress(), sdf.parse(patientDTO.getDateOfBirth()),  patientDTO.getGender(), patientDTO.getEmbg(), patientDTO.getProfession(), patientDTO.getMarriageState(),patientInsurance, familyDoctor );
+            return this.patientRepository.save(patient);
     }
 
     @Override
@@ -105,5 +112,6 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
             updatedPatient.marriageState = patientDTO.getMarriageState();
         return this.patientRepository.save(updatedPatient);
     }
+
 
 }

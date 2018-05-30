@@ -1,6 +1,7 @@
 package com.proektwp.patient_evidence_app.service;
 
 import com.proektwp.patient_evidence_app.model.*;
+import com.proektwp.patient_evidence_app.model.DTO.PatientDTO;
 import org.springframework.data.domain.Page;
 
 import java.text.ParseException;

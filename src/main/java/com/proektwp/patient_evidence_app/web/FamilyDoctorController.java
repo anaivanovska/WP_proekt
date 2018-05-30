@@ -1,7 +1,7 @@
 package com.proektwp.patient_evidence_app.web;
 
 import com.proektwp.patient_evidence_app.model.FamilyDoctor;
-import com.proektwp.patient_evidence_app.model.FamilyDoctorDTO;
+import com.proektwp.patient_evidence_app.model.DTO.FamilyDoctorDTO;
 import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.security.CustomUserDetails;
 import com.proektwp.patient_evidence_app.security.JwtTokenUtil;
@@ -11,14 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.awt.print.Pageable;
-import java.util.List;
 
 @RestController
 @RequestMapping(value="/api/doctor", produces = MediaType.APPLICATION_JSON_VALUE)

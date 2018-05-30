@@ -1,25 +1,21 @@
 package com.proektwp.patient_evidence_app.web;
 
 import com.proektwp.patient_evidence_app.model.*;
+import com.proektwp.patient_evidence_app.model.DTO.PatientDTO;
 import com.proektwp.patient_evidence_app.security.CustomUserDetails;
 import com.proektwp.patient_evidence_app.security.JwtTokenUtil;
-import com.proektwp.patient_evidence_app.service.impl.FamilyDoctorService;
 import com.proektwp.patient_evidence_app.service.impl.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import sun.java2d.pipe.SpanShapeRenderer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -44,7 +40,7 @@ public class PatientController {
 
     @CrossOrigin
     @PostMapping(value="/addNewPatient")
-    public Patient addNewPatient(@ModelAttribute PatientDTO patientDTO, HttpServletResponse response
+    public Patient addNewPatient(@ModelAttribute("patientDTO") PatientDTO patientDTO, HttpServletResponse response
     ) throws ParseException, IOException {
         return this.patientService.addNewPatient(patientDTO);
     }

@@ -64,13 +64,12 @@ public class UserController {
 
 
     @CrossOrigin
-    @GetMapping(value = "/role", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getUserRole(HttpServletRequest request) {
+    @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User getUserRole(HttpServletRequest request) {
         String authToken = request.getHeader(tokenHeader).substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(authToken);
         CustomUserDetails userDetails  = (CustomUserDetails) this.userDetailsService.loadUserByUsername(username);
-        System.out.println(userDetails.address);
-        return JSONParser.quote(String.valueOf(userDetails.role));
+        return (User)userDetails;
     }
 }
 

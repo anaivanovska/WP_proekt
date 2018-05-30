@@ -21,7 +21,7 @@ public class Patient extends User{
     public Date dateOfBirth;
 
     @NotNull
-    public String gender;
+    public Gender gender;
 
     @NotNull
     public String embg;
@@ -36,7 +36,7 @@ public class Patient extends User{
     @JsonIgnoreProperties("deputyFamilyDoctor")
     public FamilyDoctor familyDoctor;
 
-    @OneToOne(mappedBy = "patient",cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     public HealthInsurance healthInsurance;
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "patient")
@@ -52,13 +52,15 @@ public class Patient extends User{
     };
 
 
-    public Patient(String userId, String firstName, String lastName, String password, String email, String phoneNumber, String address, Date dateOfBirth, String gender, String embg, String profession, String marriageState, FamilyDoctor familyDoctor) {
+    public Patient(String userId, String firstName, String lastName, String password, String email, String phoneNumber, String address, Date dateOfBirth, String gender, String embg, String profession, String marriageState, HealthInsurance healthInsurance, FamilyDoctor familyDoctor) {
         super(userId, firstName, lastName, Role.ROLE_PATIENT, password, email, phoneNumber, address);
         this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
+        System.out.println("GENDER VO PATIENT: " + Gender.valueOf(gender));
+        this.gender = Gender.valueOf(gender);
         this.embg = embg;
         this.profession = profession;
         this.marriageState = marriageState;
+        this.healthInsurance = healthInsurance;
         this.familyDoctor = familyDoctor;
         this.healthInsurance = null;
         this.healthExaminations = null;

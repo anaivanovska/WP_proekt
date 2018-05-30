@@ -1,4 +1,4 @@
-package com.proektwp.patient_evidence_app.model;
+package com.proektwp.patient_evidence_app.model.DTO;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,6 +20,13 @@ public class PatientDTO implements Serializable{
     String familyDoctorID;
     String embg;
     String gender;
+    String healthLegitimationNumber;
+    String registrationNumber;
+    String activityID;
+    String typeOfHealthProtection;
+
+
+
 
     public String getEmbg() {
         return embg;
@@ -123,5 +130,37 @@ public class PatientDTO implements Serializable{
 
     public void setFamilyDoctorID(String familyDoctorID) {
         this.familyDoctorID = familyDoctorID;
+    }
+
+    public String getHealthLegitimationNumber() {
+        return healthLegitimationNumber;
+    }
+
+    public void setHealthLegitimationNumber(String healthLegitimationNumber) {
+        this.healthLegitimationNumber = healthLegitimationNumber;
+    }
+
+    public String getRegistrationNumber() {
+        return registrationNumber;
+    }
+
+    public void setRegistrationNumber(String registrationNumber) {
+        this.registrationNumber = registrationNumber;
+    }
+
+    public String getActivityID() {
+        return activityID;
+    }
+
+    public void setActivityID(String activityID) {
+        this.activityID = activityID;
+    }
+
+    public String getTypeOfHealthProtection() {
+        return typeOfHealthProtection;
+    }
+
+    public void setTypeOfHealthProtection(String typeOfHealthProtection) {
+        this.typeOfHealthProtection = typeOfHealthProtection;
     }
 }

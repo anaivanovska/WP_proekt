@@ -2,10 +2,9 @@ package com.proektwp.patient_evidence_app.service.impl;
 
 
 import com.proektwp.patient_evidence_app.model.FamilyDoctor;
-import com.proektwp.patient_evidence_app.model.FamilyDoctorDTO;
+import com.proektwp.patient_evidence_app.model.DTO.FamilyDoctorDTO;
 import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.model.exceptions.DoctorExsistsException;
-import com.proektwp.patient_evidence_app.model.exceptions.DoctorNotFoundException;
 import com.proektwp.patient_evidence_app.model.exceptions.PatientNotFoundException;
 import com.proektwp.patient_evidence_app.persistence.FamilyDoctorRepository;
 import com.proektwp.patient_evidence_app.persistence.PatientRepository;

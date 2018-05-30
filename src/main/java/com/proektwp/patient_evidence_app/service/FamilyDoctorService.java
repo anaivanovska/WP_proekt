@@ -1,7 +1,7 @@
 package com.proektwp.patient_evidence_app.service;
 
 import com.proektwp.patient_evidence_app.model.FamilyDoctor;
-import com.proektwp.patient_evidence_app.model.FamilyDoctorDTO;
+import com.proektwp.patient_evidence_app.model.DTO.FamilyDoctorDTO;
 import com.proektwp.patient_evidence_app.model.Patient;
 import org.springframework.data.domain.Page;
 

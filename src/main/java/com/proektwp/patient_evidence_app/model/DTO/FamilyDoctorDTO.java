@@ -1,4 +1,4 @@
-package com.proektwp.patient_evidence_app.model;
+package com.proektwp.patient_evidence_app.model.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 

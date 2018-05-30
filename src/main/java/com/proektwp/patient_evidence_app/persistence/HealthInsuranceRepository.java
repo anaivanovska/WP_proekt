@@ -7,5 +7,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface HealthInsuranceRepository extends CrudRepository<HealthInsurance, String> {
-    public HealthInsurance findByPatient(Patient patient);
 }
