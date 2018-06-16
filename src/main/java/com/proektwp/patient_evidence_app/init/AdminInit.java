@@ -3,7 +3,7 @@ package com.proektwp.patient_evidence_app.init;
 
 import com.proektwp.patient_evidence_app.model.Role;
 import com.proektwp.patient_evidence_app.model.User;
-import com.proektwp.patient_evidence_app.security.UserRepository;
+import com.proektwp.patient_evidence_app.persistence.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,22 +27,23 @@ public class AdminInit {
 
     @PostConstruct
     public void init() {
+        if( userRepository.count() ==0 ) {
+            User user = new User();
+            String username = environment.getProperty("app.user.admin.username");
+            String email = environment.getProperty("app.user.admin.email");
+            String password = passwordEncoder.encode(environment.getProperty("app.user.admin.password"));
 
-        User user = new User();
-        String username  = environment.getProperty("app.user.admin.username");
-        String email = environment.getProperty("app.user.admin.email");
-        String password = passwordEncoder.encode(environment.getProperty("app.user.admin.password"));
+            user.userId = username;
+            user.role = Role.ROLE_ADMIN;
+            user.firstName = username;
+            user.lastName = username;
+            user.email = email;
+            user.password = password;
+            user.address = "Admin address";
+            user.phoneNumber = "Admin phoneNumber";
 
-        user.userId = username;
-        user.role = Role.ROLE_ADMIN;
-        user.firstName = username;
-        user.lastName = username;
-        user.email= email;
-        user.password = password;
-        user.address = "Admin address";
-        user.phoneNumber = "Admin phoneNumber";
-
-        this.userRepository.save(user);
+            this.userRepository.save(user);
+        }
     }
 
 

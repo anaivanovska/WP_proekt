@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FamilyDoctorService implements com.proektwp.patient_evidence_app.service.FamilyDoctorService {
@@ -43,6 +44,14 @@ public class FamilyDoctorService implements com.proektwp.patient_evidence_app.se
         }
         System.out.println(familyDoctor.firstName);
         return familyDoctor;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<String> findAllFamilyDoctorsID() {
+        return this.familyDoctorRepository.findAll().stream()
+                                                    .map(familyDoctor -> familyDoctor.userId)
+                                                    .collect(Collectors.toList());
     }
 
     @Override

@@ -17,8 +17,6 @@ public class HealthInsurance {
 
     public String typeOfHealthProtection;
 
-
-
     public HealthInsurance(){}
 
     public HealthInsurance(String healthLegitimationNumber, String registrationNumber, String activityID, String typeOfHealthProtection) {

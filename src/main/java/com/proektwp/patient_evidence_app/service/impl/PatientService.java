@@ -61,7 +61,9 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
     @Transactional(readOnly = true)
     public List<Vaccine> findVaccinesForPatient(String patientID) {
         Patient patient = this.findPatientByID(patientID);
-        return this.vaccineRepository.findByPatient(patient);
+        List<Vaccine> vaccines  = this.vaccineRepository.findByPatient(patient);
+        return vaccines;
+
     }
 
     @Override
@@ -83,7 +85,6 @@ public class PatientService implements com.proektwp.patient_evidence_app.service
         this.healthInsuranceRepository.save(patientInsurance);
         String encryptedPassword = this.bCryptPasswordEncoder.encode(patientDTO.getPassword());
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        System.out.println("GENDER: " + patientDTO.getGender());
         patient = new Patient(patientDTO.getUserId(), patientDTO.getFirstName(), patientDTO.getLastName(), encryptedPassword, patientDTO.getEmail(), patientDTO.getPhoneNumber(), patientDTO.getAddress(), sdf.parse(patientDTO.getDateOfBirth()),  patientDTO.getGender(), patientDTO.getEmbg(), patientDTO.getProfession(), patientDTO.getMarriageState(),patientInsurance, familyDoctor );
             return this.patientRepository.save(patient);
     }

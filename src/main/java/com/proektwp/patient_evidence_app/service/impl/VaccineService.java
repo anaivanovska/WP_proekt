@@ -1,6 +1,5 @@
 package com.proektwp.patient_evidence_app.service.impl;
 
-import com.proektwp.patient_evidence_app.model.Patient;
 import com.proektwp.patient_evidence_app.model.Vaccine;
 import com.proektwp.patient_evidence_app.model.VaccineID;
 import com.proektwp.patient_evidence_app.model.exceptions.VaccineNotFoundException;
@@ -10,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -17,10 +18,12 @@ import java.util.List;
 public class VaccineService implements com.proektwp.patient_evidence_app.service.VaccineService {
 
     private VaccineRepository vaccineRepository;
+    private PatientRepository patientRepository;
 
     @Autowired
-    public VaccineService(VaccineRepository vaccineRepository) {
+    public VaccineService(VaccineRepository vaccineRepository, PatientRepository patientRepository) {
         this.vaccineRepository = vaccineRepository;
+        this.patientRepository = patientRepository;
     }
 
 
@@ -33,24 +36,41 @@ public class VaccineService implements com.proektwp.patient_evidence_app.service
         return vaccine;
     }
 
-    @Override
     @Transactional
-    public Vaccine addNewVaccine(Vaccine newVaccine) {
-
-        Vaccine vaccine = this.vaccineRepository.findOne(newVaccine.vaccineID);
+    @Override
+    public Vaccine addNewVaccine(String userId, String name, String dateOfReceipt) throws ParseException {
+        VaccineID vaccineID = new VaccineID();
+        vaccineID.setName(name);
+        vaccineID.setUserId(userId);
+        Vaccine vaccine = this.vaccineRepository.findOne(vaccineID);
         if(vaccine != null){
-
+            return null;
         }
-        return this.vaccineRepository.save(newVaccine);
+
+        if(vaccineID == null){
+            System.out.println("VACCINE IS NULL");
+        }
+
+        vaccine = new Vaccine();
+        vaccine.vaccineID = vaccineID;
+        vaccine.dateOfReceipt = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfReceipt);
+        vaccine.patient = this.patientRepository.findOne(userId);
+        return this.vaccineRepository.save(vaccine);
     }
 
-    @Override
+
+
     @Transactional
-    public Vaccine updateVaccine(Vaccine vaccine){
-        Vaccine updatedVaccine = this.findVaccineByID(vaccine.vaccineID);
-        updatedVaccine.dateOfReceipt = vaccine.dateOfReceipt;
-        return this.vaccineRepository.save(updatedVaccine);
+    @Override
+    public Vaccine updateVaccine(String userId, String name, String dateOfReceipt) throws ParseException {
+        VaccineID vaccineID = new VaccineID();
+        vaccineID.setName(name);
+        vaccineID.setUserId(userId);
+        Vaccine vaccine = this.findVaccineByID(vaccineID);
+        vaccine.dateOfReceipt = new SimpleDateFormat("yyyy-MM-dd").parse(dateOfReceipt);
+        return vaccine;
     }
+
 
     @Override
     public Vaccine deleteVaccine(VaccineID vaccineID) {

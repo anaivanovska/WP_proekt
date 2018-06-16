@@ -8,6 +8,11 @@ buildscript {
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
+	dependencies {
+		optional("org.springframework.boot:spring-boot-configuration-processor")
+	}
+
+	compileJava.dependsOn(processResources)
 }
 
 apply plugin: 'java'

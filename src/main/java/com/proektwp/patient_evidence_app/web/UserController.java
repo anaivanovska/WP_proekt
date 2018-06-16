@@ -1,7 +1,9 @@
 package com.proektwp.patient_evidence_app.web;
 
+import com.proektwp.patient_evidence_app.model.DTO.PasswordDTO;
 import com.proektwp.patient_evidence_app.model.User;
 import com.proektwp.patient_evidence_app.security.*;
+import com.proektwp.patient_evidence_app.service.UserService;
 import jdk.nashorn.internal.parser.JSONParser;
 import org.codehaus.jackson.map.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,20 +31,19 @@ public class UserController {
     @Value("${jwt.header}")
     private String tokenHeader;
     private CustomUserDetailsService userDetailsService;
-    private Environment environment;
-    private JavaMailSender mailSender;
     private AuthenticationManager authenticationManager;
     private JwtTokenUtil jwtTokenUtil;
+    private UserService userService;
 
 
     @Autowired
-    public UserController(CustomUserDetailsService userDetailsService, Environment environment, JavaMailSender mailSender, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil) {
+    public UserController(CustomUserDetailsService userDetailsService, AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, UserService userService) {
         this.userDetailsService = userDetailsService;
-        this.environment = environment;
-        this.mailSender = mailSender;
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.userService = userService;
     }
+
 
 
     @CrossOrigin
@@ -65,11 +66,19 @@ public class UserController {
 
     @CrossOrigin
     @GetMapping(value = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User getUserRole(HttpServletRequest request) {
+    public User getUser(HttpServletRequest request) {
         String authToken = request.getHeader(tokenHeader).substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(authToken);
         CustomUserDetails userDetails  = (CustomUserDetails) this.userDetailsService.loadUserByUsername(username);
         return (User)userDetails;
+    }
+
+
+    @CrossOrigin
+    @PutMapping(value = "/{userId}/changePassword", consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
+    public User changeUserPassword(@RequestBody(required = true) PasswordDTO passwordDTO, @PathVariable String userId){
+        return this.userService.changeUserPassword(passwordDTO, userId);
+
     }
 }
 

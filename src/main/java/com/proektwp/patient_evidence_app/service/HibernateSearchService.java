@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface HibernateSearchService {
 
-    public List<Patient> getAllMatchingResults(String keyword);
+    public List<Patient> getAllPatients(String keyword, String doctorID);
 }

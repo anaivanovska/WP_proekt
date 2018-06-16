@@ -1,18 +1,22 @@
 package com.proektwp.patient_evidence_app.service.impl;
 
 
-import com.proektwp.patient_evidence_app.model.HealthExamination;
-import com.proektwp.patient_evidence_app.model.HealthExaminationID;
-import com.proektwp.patient_evidence_app.model.Medicine;
+import com.proektwp.patient_evidence_app.model.*;
+import com.proektwp.patient_evidence_app.model.DTO.HealthExaminationDTO;
+import com.proektwp.patient_evidence_app.model.DTO.MedicineDTO;
 import com.proektwp.patient_evidence_app.model.exceptions.HealthExaminationExistsException;
 import com.proektwp.patient_evidence_app.model.exceptions.HealthExaminationNotFoundException;
 import com.proektwp.patient_evidence_app.persistence.HealthExaminationRepository;
 import com.proektwp.patient_evidence_app.persistence.MedicineRepository;
+import com.proektwp.patient_evidence_app.persistence.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.transaction.TransactionScoped;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +24,13 @@ import java.util.List;
 public class HealthExaminationService implements com.proektwp.patient_evidence_app.service.HealthExaminationService{
     private HealthExaminationRepository healthExaminationRepository;
     private MedicineRepository medicineRepository;
+    private PatientRepository patientRepository;
 
     @Autowired
-    public HealthExaminationService(HealthExaminationRepository healthExaminationRepository, MedicineRepository medicineRepository) {
+    public HealthExaminationService(HealthExaminationRepository healthExaminationRepository, MedicineRepository medicineRepository, PatientRepository patientRepository) {
         this.healthExaminationRepository = healthExaminationRepository;
         this.medicineRepository = medicineRepository;
+        this.patientRepository = patientRepository;
     }
 
     @Override
@@ -44,16 +50,73 @@ public class HealthExaminationService implements com.proektwp.patient_evidence_a
         return this.medicineRepository.findByHealthExamination(healthExamination);
     }
 
-    @Override
     @Transactional
-    public HealthExamination addNewExamination(HealthExamination newHealthExamination) {
-        HealthExamination healthExamination = this.healthExaminationRepository.findOne(newHealthExamination.examinationID);
-        if(healthExamination != null){
-            throw new HealthExaminationExistsException(healthExamination.examinationID.getDateOfExamination(), healthExamination.examinationID.getUserId());
-        }
+    @Override
+    public HealthExamination addNewExamination(HealthExaminationDTO examinationDTO, String userId) throws ParseException {
+        HealthExaminationID examinationID = new HealthExaminationID();
+        Date dateOfExamination = new SimpleDateFormat("yyyy-MM-dd").parse(examinationDTO.getDateOfExamination());
 
-        return this.healthExaminationRepository.save(newHealthExamination);
+        examinationID.setUserId(userId);
+        examinationID.setDateOfExamination(dateOfExamination);
+        System.out.println("Examination set  ");
+
+        HealthExamination examination = this.healthExaminationRepository.findOne(examinationID);
+        if(examination != null){
+            return null;
+        }
+            Patient patient = this.patientRepository.findOne(userId);
+        System.out.println(examinationDTO.getRtc_Finding());
+
+        examination = new HealthExamination(dateOfExamination,examinationDTO.getDiagnosisAtMKB(),
+                                                examinationDTO.getLaboratory_Finding(), examinationDTO.getRtc_Finding(),
+                                                examinationDTO.getEho_Finding(), examinationDTO.getComputed_Tomography(),
+                                                examinationDTO.getMagnetic_Resonance(), examinationDTO.getSent_To_A_specialist(),
+                                                examinationDTO.getIllness(), examinationDTO.getBandage(), examinationDTO.getAntibody_Prophylaxis(),
+                                                examinationDTO.getTypeOfTherapy(), patient);
+
+
+
+        examination = this.healthExaminationRepository.save(examination);
+
+
+        List<Medicine> savedMedicine = this.saveTherapyForExamination(examination, examinationDTO.getMedicines());
+                    if(savedMedicine.size() != examinationDTO.getMedicines().size()){
+                        return null;
+                    }
+
+        return  examination;
+
+
     }
+
+
+
+    private List<Medicine> saveTherapyForExamination(HealthExamination examination, List<MedicineDTO> medicines){
+        List<Medicine> savedMedicines = new ArrayList<>();
+        medicines.forEach(medicine -> {
+            System.out.println("medicine: "+ medicine.getName());
+            MedicineID medicineID = new MedicineID();
+            medicineID.setName(medicine.getName());
+            medicineID.setExaminationID(examination.examinationID);
+            System.out.println("Find medicine -> next");
+
+            Medicine newMedicine = this.medicineRepository.findOne(medicineID);
+            if(newMedicine == null){
+                System.out.println("medicine e null ");
+                newMedicine = new Medicine();
+                newMedicine.medicineID = medicineID;
+                newMedicine.quantity = medicine.getQuantity();
+                newMedicine.typeOfReception = medicine.getTypeOfReception();
+                newMedicine.healthExamination = examination;
+                newMedicine = this.medicineRepository.save(newMedicine);
+                System.out.println("Saved medicine: "+ newMedicine.quantity );
+                savedMedicines.add(newMedicine);
+            }
+        });
+
+        return savedMedicines;
+    }
+
 
     @Override
     @Transactional

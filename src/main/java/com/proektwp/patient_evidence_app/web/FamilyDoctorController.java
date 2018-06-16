@@ -11,11 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping(value="/api/doctor", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -23,19 +27,31 @@ public class FamilyDoctorController {
 
     @Value("${jwt.header}")
     private String tokenHeader;
+
+
+    @Value("${from.email}")
+    private String fromMail;
+
+    private JavaMailSender mailSender;
     private JwtTokenUtil jwtTokenUtil;
     private FamilyDoctorService familyDoctorService;
     private PatientService patientService;
 
     @Autowired
-    public FamilyDoctorController(JwtTokenUtil jwtTokenUtil, FamilyDoctorService familyDoctorService, PatientService patientService) {
+    public FamilyDoctorController(JwtTokenUtil jwtTokenUtil, FamilyDoctorService familyDoctorService, PatientService patientService, JavaMailSender mailSender) {
         this.jwtTokenUtil = jwtTokenUtil;
         this.familyDoctorService = familyDoctorService;
         this.patientService = patientService;
+        this.mailSender = mailSender;
     }
 
 
 
+    @CrossOrigin
+    @GetMapping(value = "/getAll")
+    public List<String> findAllFamilyDoctorsID(){
+        return this.familyDoctorService.findAllFamilyDoctorsID();
+    }
     @CrossOrigin
     @GetMapping(value = "/get")
     public FamilyDoctor findFamilyDoctor(HttpServletRequest request) {
@@ -55,7 +71,12 @@ public class FamilyDoctorController {
     @CrossOrigin
     @PostMapping(value = "/addNewFamilyDoctor")
     public FamilyDoctor addNewFamilyDoctor(@ModelAttribute FamilyDoctorDTO familyDoctorDTO, HttpServletResponse response){
-        return this.familyDoctorService.addNewFamilyDoctor(familyDoctorDTO);
+        String password = UUID.randomUUID().toString();
+        familyDoctorDTO.setPassword(password);
+        FamilyDoctor newFamilyDoctor =  this.familyDoctorService.addNewFamilyDoctor(familyDoctorDTO);
+        String body = "Vashiot profil e kreiran! Najavete se so korisnicko ime: " + newFamilyDoctor.userId + ", password: " + password + ". Vednash po najavata vnesete svoj pasword!";
+        sendConfirmationEmail("Aktivacija na korisnicki profil ",body, newFamilyDoctor.email);
+        return newFamilyDoctor;
     }
 
     @CrossOrigin
@@ -72,10 +93,13 @@ public class FamilyDoctorController {
         return this.familyDoctorService.deleteFamilyDoctor(doctorID);
     }
 
-
-    @CrossOrigin
-    @GetMapping(value = "/patient/{patientId}")
-    public Patient getPatient(@PathVariable String patientId){
-        return this.patientService.findPatientByID(patientId);
+    private void sendConfirmationEmail(String subject, String body, String empEmail) {
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setSubject(subject);
+        email.setText(body);
+        email.setTo(empEmail);
+        email.setFrom(fromMail);
+        mailSender.send(email);
     }
+
 }

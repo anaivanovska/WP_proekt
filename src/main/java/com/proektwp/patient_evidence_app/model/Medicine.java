@@ -6,20 +6,24 @@ import javax.persistence.*;
 @Table( name = "medicine")
 public class Medicine {
 
-    @Id
-    public String name;
+    @EmbeddedId
+    public MedicineID medicineID;
 
     public int quantity;
 
     public String typeOfReception;
 
+
+    @MapsId("examinationID")
     @ManyToOne
     public HealthExamination healthExamination;
 
     public Medicine(){}
 
     public Medicine(String name, int quantity, String typeOfReception, HealthExamination healthExamination) {
-        this.name = name;
+        this.medicineID = new MedicineID();
+        this.medicineID.setName(name);
+        this.medicineID.setExaminationID(healthExamination.examinationID);
         this.quantity = quantity;
         this.typeOfReception = typeOfReception;
         this.healthExamination = healthExamination;

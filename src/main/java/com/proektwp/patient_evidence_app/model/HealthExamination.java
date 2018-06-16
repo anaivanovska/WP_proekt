@@ -57,6 +57,7 @@ public class HealthExamination {
 
     public String typeOfTherapy;
 
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "healthExamination")
     public List<Medicine> medicines;
 

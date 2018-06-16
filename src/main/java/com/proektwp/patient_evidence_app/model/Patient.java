@@ -3,7 +3,9 @@ package com.proektwp.patient_evidence_app.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
+import org.hibernate.search.annotations.IndexedEmbedded;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -32,6 +34,7 @@ public class Patient extends User{
     @NotNull
     public String marriageState;
 
+
     @ManyToOne
     @JsonIgnoreProperties("deputyFamilyDoctor")
     public FamilyDoctor familyDoctor;
@@ -55,15 +58,13 @@ public class Patient extends User{
     public Patient(String userId, String firstName, String lastName, String password, String email, String phoneNumber, String address, Date dateOfBirth, String gender, String embg, String profession, String marriageState, HealthInsurance healthInsurance, FamilyDoctor familyDoctor) {
         super(userId, firstName, lastName, Role.ROLE_PATIENT, password, email, phoneNumber, address);
         this.dateOfBirth = dateOfBirth;
-        System.out.println("GENDER VO PATIENT: " + Gender.valueOf(gender));
         this.gender = Gender.valueOf(gender);
         this.embg = embg;
         this.profession = profession;
         this.marriageState = marriageState;
         this.healthInsurance = healthInsurance;
         this.familyDoctor = familyDoctor;
-        this.healthInsurance = null;
-        this.healthExaminations = null;
-        this.vaccines = null;
+        this.healthExaminations = new ArrayList<>();
+        this.vaccines = new ArrayList<>();
     }
 }

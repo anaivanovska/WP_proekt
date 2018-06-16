@@ -1,14 +1,20 @@
 package com.proektwp.patient_evidence_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
-import org.hibernate.search.annotations.Store;
+import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
+import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
+import org.hibernate.search.annotations.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Indexed
+@AnalyzerDef(name = "analyser",
+        tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
+        filters = {
+                @TokenFilterDef(factory = LowerCaseFilterFactory.class)
+        })
+
 @Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
@@ -18,11 +24,13 @@ public class User {
     public String userId;
 
     @NotNull
-    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO)
+    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO, analyze = Analyze.YES)
+    @Analyzer(definition = "analyser")
     public String firstName;
 
     @NotNull
-    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO)
+    @Field(index = org.hibernate.search.annotations.Index.YES, store = Store.NO, analyze = Analyze.YES)
+    @Analyzer(definition = "analyser")
     public String lastName;
 
     @NotNull
