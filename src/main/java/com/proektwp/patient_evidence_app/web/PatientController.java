@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -127,6 +128,16 @@ public class PatientController {
         System.out.println("RTC" + examinationDTO.getRtc_Finding());
         //examinationDTO.getMedicines().forEach(medicine -> System.out.println(medicine.getName()));
         return this.examinationService.addNewExamination(examinationDTO, userId);
+    }
+
+
+    @CrossOrigin
+    @GetMapping(value = "/{userId}/examination/{dateOfExamination}/medicines")
+    public List<Medicine> getMedicinesForExamination(@PathVariable String userId, @PathVariable String dateOfExamination) throws ParseException {
+        HealthExaminationID examinationID = new HealthExaminationID();
+        examinationID.setUserId(userId);
+        examinationID.setDateOfExamination(new SimpleDateFormat("yyyy-MM-dd").parse(dateOfExamination));
+        return this.examinationService.findMedicinesForExamination(examinationID);
     }
 
     private void sendConfirmationEmail(String subject, String body, String empEmail) {

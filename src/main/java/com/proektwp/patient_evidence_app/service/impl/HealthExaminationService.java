@@ -45,7 +45,7 @@ public class HealthExaminationService implements com.proektwp.patient_evidence_a
 
     @Override
     @Transactional(readOnly = true)
-    public List<Medicine> findMedicineForExamination(HealthExaminationID healthExaminationID) {
+    public List<Medicine> findMedicinesForExamination(HealthExaminationID healthExaminationID) {
         HealthExamination healthExamination= this.findHealthExamination(healthExaminationID);
         return this.medicineRepository.findByHealthExamination(healthExamination);
     }

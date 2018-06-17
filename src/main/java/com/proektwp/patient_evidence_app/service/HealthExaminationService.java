@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface HealthExaminationService {
     public HealthExamination findHealthExamination(HealthExaminationID healthExaminationID);
-    public List<Medicine> findMedicineForExamination(HealthExaminationID healthExaminationID);
+    public List<Medicine> findMedicinesForExamination(HealthExaminationID healthExaminationID);
     public HealthExamination addNewExamination(HealthExaminationDTO examinationDTO, String userId) throws ParseException;
     public HealthExamination updateExamination(HealthExamination healthExamination);
     public HealthExamination deleteExamination(HealthExaminationID healthExaminationID);

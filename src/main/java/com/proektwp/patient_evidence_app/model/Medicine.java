@@ -1,11 +1,17 @@
 package com.proektwp.patient_evidence_app.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import javax.persistence.*;
 
 @Entity
 @Table( name = "medicine")
 public class Medicine {
 
+    @JsonIgnoreProperties("examinationID")
     @EmbeddedId
     public MedicineID medicineID;
 
@@ -14,6 +20,7 @@ public class Medicine {
     public String typeOfReception;
 
 
+    @JsonIgnore
     @MapsId("examinationID")
     @ManyToOne
     public HealthExamination healthExamination;
