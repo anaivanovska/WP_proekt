@@ -15,6 +15,7 @@ public class CustomUserDetails extends User implements org.springframework.secur
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        System.out.println("ROLE" + this.role);
       return  AuthorityUtils.createAuthorityList(String.valueOf(this.role));
 
     }

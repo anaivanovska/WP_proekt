@@ -4,25 +4,17 @@ import com.proektwp.patient_evidence_app.model.DTO.PasswordDTO;
 import com.proektwp.patient_evidence_app.model.User;
 import com.proektwp.patient_evidence_app.security.*;
 import com.proektwp.patient_evidence_app.service.UserService;
-import jdk.nashorn.internal.parser.JSONParser;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api/user")
@@ -76,7 +68,7 @@ public class UserController {
 
     @CrossOrigin
     @PutMapping(value = "/{userId}/changePassword", consumes = "application/json", produces = MediaType.APPLICATION_JSON_VALUE)
-    public User changeUserPassword(@RequestBody(required = true) PasswordDTO passwordDTO, @PathVariable String userId){
+    public User changeUserPassword(@RequestBody PasswordDTO passwordDTO, @PathVariable String userId){
         return this.userService.changeUserPassword(passwordDTO, userId);
 
     }
